@@ -15,23 +15,35 @@ const contactsSlice = createSlice({
       reducer(state, action) {
         state.push(action.payload);
       },
-      prepare(name, number) {
+      prepare(values) {
         return {
           payload: {
-            // text,
             id: nanoid(),
-            name,
-            number,
-            // completed: false,
+            name: values.name,
+            number: values.number,
           },
         };
       },
     },
+
     deleteContact(state, action) {
-      state.filter(contact => contact.id !== action.payload);
+      return state.filter(contact => contact.id !== action.payload);
+    },
+
+    visibleContacts(state, action) {
+      // return {
+      //   ...state,
+      //   ...state.filter(contact =>
+      //     contact.name.toLowerCase().includes(action.payload)
+      //   )
+      // }
+      return state.filter(contact =>
+        contact.name.toLowerCase().includes(action.payload)
+      );
     },
   },
 });
 
-export const { addContact, deleteContact } = contactsSlice.actions;
+export const { addContact, deleteContact, visibleContacts } =
+  contactsSlice.actions;
 export const contactsReducer = contactsSlice.reducer;
