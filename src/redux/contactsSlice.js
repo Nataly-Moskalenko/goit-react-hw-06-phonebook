@@ -29,18 +29,6 @@ const contactsSlice = createSlice({
     deleteContact(state, action) {
       return state.filter(contact => contact.id !== action.payload);
     },
-
-    visibleContacts(state, action) {
-      // return {
-      //   ...state,
-      //   ...state.filter(contact =>
-      //     contact.name.toLowerCase().includes(action.payload)
-      //   )
-      // }
-      return state.filter(contact =>
-        contact.name.toLowerCase().includes(action.payload)
-      );
-    },
   },
 });
 

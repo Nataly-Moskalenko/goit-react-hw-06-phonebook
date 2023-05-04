@@ -2,13 +2,8 @@ import css from './App.module.css';
 import ContactForm from './contactForm/ContactForm';
 import ContactList from './contactList/ContactList';
 import Filter from './filter/Filter';
-// import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  addContact,
-  deleteContact,
-  visibleContacts,
-} from 'redux/contactsSlice';
+import { addContact, deleteContact } from 'redux/contactsSlice';
 import { changeFilter } from 'redux/filterSlice';
 import { getFilter, getContacts } from 'redux/selectors';
 
@@ -18,7 +13,16 @@ export function App() {
   const contacts = useSelector(getContacts);
 
   const handleSubmit = (values, { resetForm }) => {
-    dispatch(addContact(values));
+    if (
+          contacts.find(
+            contact => contact.name.toLowerCase() === values.name.toLowerCase()
+          )
+        ) {
+          window.alert(`${values.name} is already in contacts`);
+        } else {
+          dispatch(addContact(values));
+        }
+    
     resetForm();
   };
 
@@ -27,17 +31,10 @@ export function App() {
   };
 
   const handleChangeFilter = e => {
-    dispatch(changeFilter(e.currentTarget.value));
-    dispatch(visibleContacts(e.currentTarget.value));
-  };
+    dispatch(changeFilter(e.currentTarget.value));    
+  };  
 
-  // const handleVisibleContacts = filter => {
-  //   dispatch(visibleContacts(filter));
-  // };
-
-  // const getVisibleContacts = handleVisibleContacts();
-
-  // const [filter, setFilter] = useState('');
+ 
   // const [contacts, setContacts] = useState(() => {
   //   return (
   //     JSON.parse(window.localStorage.getItem('contacts')) ?? [
@@ -51,42 +48,16 @@ export function App() {
 
   // useEffect(() => {
   //   window.localStorage.setItem('contacts', JSON.stringify(contacts));
-  // }, [contacts]);
+  // }, [contacts]);  
 
-  // const deleteContact = id => {
-  //   setContacts(contacts.filter(contact => contact.id !== id));
-  // };
+  const getVisibleContacts = () => {
+    const normalizedFilter = filter.toLowerCase();
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(normalizedFilter)
+    );
+  };
 
-  // const addContact = (values, { resetForm }) => {
-  //   const newContact = {
-  //     id: nanoid(),
-  //     name: values.name,
-  //     number: values.number,
-  //   };
-  //   if (
-  //     contacts.find(
-  //       contact => contact.name.toLowerCase() === newContact.name.toLowerCase()
-  //     )
-  //   ) {
-  //     window.alert(`${newContact.name} is already in contacts`);
-  //   } else {
-  //     setContacts([newContact, ...contacts]);
-  //   }
-  //   resetForm();
-  // };
-
-  // const changeFilter = e => {
-  //   setFilter(e.currentTarget.value);
-  // };
-
-  // const getVisibleContacts = () => {
-  //   const normalizedFilter = filter.toLowerCase();
-  //   return contacts.filter(contact =>
-  //     contact.name.toLowerCase().includes(normalizedFilter)
-  //   );
-  // };
-
-  // const visibleContacts = getVisibleContacts();
+  const visibleContacts = getVisibleContacts();
 
   return (
     <div className={css.app}>
@@ -94,7 +65,10 @@ export function App() {
       <ContactForm onSubmit={handleSubmit} />
       <h2>Contacts</h2>
       <Filter value={filter} handleChange={handleChangeFilter} />
-      <ContactList contacts={contacts} onDeleteContact={handleDeleteContact} />
+      <ContactList
+        contacts={visibleContacts}
+        onDeleteContact={handleDeleteContact}
+      />
     </div>
   );
 }
